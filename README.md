@@ -1,5 +1,5 @@
 # Yew Trunk
-This is a Yew app that's built with [Trunk] and [Tailwind]
+This is a Yew app that's built with [Trunk] and [Tailwind]  
 I am experimenting with developing a webpage with Rust/Web assembly, as well as [Terraform]
 
 ## Usage
@@ -21,9 +21,14 @@ cargo install trunk wasm-bindgen-cli
 
 ### Running
 
-Rebuilds on change and hosts a local server.
+Rebuilds on _rust_ change and hosts a local server.
 ```bash
 trunk serve
+```
+
+Rebuilds on _css_ change and hosts a local server.
+```bash
+npx tailwindcss -i ./src/resource/main.css -o ./main.css --watch
 ```
 
 ### Release
