@@ -1,0 +1,15 @@
+[package]
+name = "andrew_tung_yew"
+version = "0.0.1"
+edition = "2021"
+description = "A Yew project using Trunk"
+readme = "README.md"
+repository = "https://github.com/bergtunga/yew"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+yew = { version="0.20", features=["csr"] }
+gloo = { version="*" }
+serde = "*"
+serde_json = "*"
