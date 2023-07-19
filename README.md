@@ -1,4 +1,4 @@
-# Yew Trunk
+# Yew
 This is a Yew app that's built with [Trunk] and [Tailwind]  
 I am experimenting with developing a webpage with Rust/Web assembly, as well as [Terraform]
 

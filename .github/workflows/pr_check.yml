@@ -27,6 +27,8 @@ jobs:
       uses: jetli/trunk-action@v0.1.0
       with:
         version: 'latest'
+    - name: Make Tailwind
+      run: npx tailwindcss -i ./src/resource/main.css -o ./main.css --minify
     - name: Build
       run: trunk build
     - name: Run tests
