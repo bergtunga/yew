@@ -1,9 +1,10 @@
 use gloo::console::log;
-use yew::prelude::*;
+use yew::{prelude::*, props};
 use serde::{Deserialize, Serialize};
 
 mod component;
 use component::main_header::MyTitle;
+use component::main_navigation::{MainNavigation, TabItem};
 
 #[derive(Serialize, Deserialize)]
 struct UserModel {
@@ -13,18 +14,31 @@ struct UserModel {
 
 #[function_component(App)]
 pub fn app() -> Html {
-    let message: Option<&str> = None;
-        // Some("Hi Yvette!"); // */
+    let message: Option<&str> = // None;
+        Some("Hola Mi Amor!"); // */
     let list: Vec<&str> = vec!["Hi", "Hello", "Hallo", "Hola", "Bonjour"];
-
+    let nav_items = props!(
+        component::main_navigation::Props {
+            items: vec![
+                TabItem { text: "Active".to_owned(), is_disabled: false },
+                TabItem { text: "TAB".to_owned(), is_disabled: false },
+                TabItem { text: "tAb".to_owned(), is_disabled: false },
+                TabItem { text: "tab".to_owned(), is_disabled: true }
+            ],
+            handle_newActive: Callback::from(|index: u32| {
+                // log!("index changed", index)
+            })
+        }
+    );
     html! {
         <>
             <head>
-                <title>{"Hi Yvette"}</title>
+            <title>{"Hi Yvette"}</title>
             </head>
             <body>
+                <MyTitle title="LVC"/>
+                <MainNavigation ..nav_items />
                 <main class="flex flex-col text-center">
-                    <MyTitle title="LVC"/>
                     if let Some(message) = message {
                         <p>{message}</p>
                     } else {
