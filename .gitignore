@@ -1,9 +1,11 @@
 /dist/
 /target/
 *.old
-main.css
+assets/main.css
 *.env
 */**/terraform.tfstate
 */**/terraform.tfstate.backup
 */**/.terraform/*
 */**/.terraform.lock.hcl
+*id_rsa
+*id_rsa.pub

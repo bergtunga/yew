@@ -7,50 +7,41 @@ resource "digitalocean_droplet" "web" {
     ssh_keys = [data.digitalocean_ssh_key.do_ssh_key.id]
     vpc_uuid = digitalocean_vpc.web.id
     tags=["${var.name}-webserver"]
-    # user_data = <<TXT
-    # #cloud-config
-    # packages:
-    #     - postgresql
-    # runcmd:
-    #     - [sh, -xc, "echo '<h1>web-${local.env["TF_VAR_REGION"]}-${count.index + 1}</h1>' >> /var/www/html/index.html"]
-    # runcmd:
-    #     - [sh, -xc, "echo '<h1>web-${local.env["TF_VAR_REGION"]}-${count.index + 1}</h1>' >> /var/www/html/index.html"]
-    
-    # ${file("../dist")}
-    # TXT
 
     user_data = <<TXT
     #cloud-config
-    packages:
-    - nginx
-    - postgresql
-    write_files:
-    ${local.dist}
+    ${jsonencode({
+      package_upgrade = true
+      package_reboot_if_required = true
+      packages = ["nginx", "postgresql"]
+      users = [
+        {
+          name = local.env["TF_VAR_USERNAME"]
+          sudo = null
+          shell = "/bin/bash"
+          ssh_authorized_keys = [
+            data.digitalocean_ssh_key.do_ssh_key.public_key
+          ]
+        }
+      ]
+      runcmd = [
+        ["sh", "-xc", "echo '<h1>web-${local.env["TF_VAR_REGION"]}-${count.index + 1}</h1>' >> /var/www/html/index.html"]
+      ]
+    })}
     TXT
     graceful_shutdown = false
 
     lifecycle {
       create_before_destroy = true
     }
-    # provisioner "file" {
-    #   source = "../dist/"
-    #   destination = "/var/www/html/"
-    #   connection {
-    #     type = "ssh"
-    #     user = "root"
-    #     host = self.ipv4_address
-    #     bastion_host = digitalocean_droplet.bastion.id
-    #     bastion_certificate = data.digitalocean_ssh_key.do_ssh_key.id
-    #   }
-    #   on_failure = continue
-    # }
 }
 
+# Warning! Limited to 5/week
 resource "digitalocean_certificate" "web" {
   name = "${var.name}-certificate"
   type = "lets_encrypt"
-  # domains = ["${local.env["TF_VAR_SUBDOMAIN"]}.${data.digitalocean_domain.web.name}"]
-  domains = ["${data.digitalocean_domain.web.name}"]
+  domains = ["${local.env["TF_VAR_SUBDOMAIN"]}.${data.digitalocean_domain.web.name}"]
+  # domains = ["${data.digitalocean_domain.web.name}"]
 
   lifecycle {
     create_before_destroy = true
@@ -81,6 +72,9 @@ resource "digitalocean_loadbalancer" "web" {
     certificate_name = digitalocean_certificate.web.name
   }
 }
+
+# resource "digitalocean_reserved_ip_assignment" "name" {
+# }
 
 resource "digitalocean_firewall" "web" {
     name = "${var.name}-vpc-traffic" # Firewall name

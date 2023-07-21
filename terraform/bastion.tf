@@ -5,15 +5,28 @@ resource "digitalocean_droplet" "bastion" {
     size = var.bastion_size
     ssh_keys = [data.digitalocean_ssh_key.do_ssh_key.id]
     vpc_uuid = digitalocean_vpc.web.id
+    tags = ["${var.name}-bastion"]
+
     user_data = <<TXT
     #cloud-config
-    users:
-    - name: ${local.env["TF_VAR_USERNAME"]}
-      sudo: false
-      ssh_authorized_keys:
-        - ${data.digitalocean_ssh_key.do_ssh_key.public_key}
-    package_update: true
-    package_upgrade: true
+    ${jsonencode({
+      users = [
+        {
+          name = local.env["TF_VAR_USERNAME"]
+          sudo = null
+          shell = "/bin/bash"
+          ssh_authorized_keys = [
+            data.digitalocean_ssh_key.do_ssh_key.public_key
+          ]
+          ssh_keys = {
+            rsa_private = local.bastion_key
+            rsa_public = local.bastion_key_pub
+          }
+        }
+      ]
+      package_upgrade = true
+      package_reboot_if_required = true
+    })}
     TXT
 }
 

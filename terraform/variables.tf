@@ -1,13 +1,7 @@
 locals {
   env = { for tuple in regexall("(.*?)=(.*)", file(".env")) : tuple[0] => sensitive(tuple[1]) }
-  dist = join("\n", [ 
-    for f in fileset("../dist/", "**"):
-        <<CLD
-        - encoding: b64
-          content: ${filebase64("../dist/${f}")}
-          path: /var/www/html/${f}
-        CLD
-    ])
+  bastion_key = file("host_id_rsa")
+  bastion_key_pub = file("host_id_rsa.pub")
 }
 
 variable "droplet_count" {
