@@ -4,37 +4,56 @@ I am experimenting with developing a webpage with Rust/Web assembly, as well as 
 
 ## Usage
 
-visit [My Website][mywebsite]
+[See it Live!][mywebsite]
 
-### Development
-(This repo is private. Did you forget?)
+## Environment Configuration
+(This repo is private. Gotta get started again? I hope you kept it up to date...)
 
 Install Rust: <https://www.rust-lang.org/tools/install>
 
-To compile Rust to WASM, we need to have the `wasm32-unknown-unknown` target installed.
-To development-serve, installed and run via cargo
+To compile Rust to WASM, we need `wasm32-unknown-unknown` installed.
+To development-serve, install and run via cargo
+For deployment infastructure, use terraform
 
 ```bash
+# rustup compiles the rust -> wasm transpiler
 rustup target add wasm32-unknown-unknown
+# package manager to install trunk and the other thing?
 cargo install trunk wasm-bindgen-cli
+
+# Terraform. Copied from https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
+wget -O- https://apt.releases.hashicorp.com/gpg | \
+gpg --dearmor | \
+sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+gpg --no-default-keyring \
+--keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+--fingerprint
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update
+sudo apt-get install terraform
 ```
 
-### Running
+## Local Development (Contribution)
 
-Rebuilds on _rust_ change and hosts a local server.
 ```bash
+# Rebuilds on rust change and hosts a local server.
 trunk serve
-```
-
-Rebuilds on _css_ change and hosts a local server.
-```bash
+# Rebuilds on css change and hosts a local server.
 npx tailwindcss -i ./src/resource/main.css -o ./main.css --watch
 ```
 
-### Release
+## Deploy and Release
+Populate the terraform/.env.sample file and rename to .env
 
-```bash
-trunk build --release
+```sh
+# To set up infastructure
+cd terraform && terraform apply
+
+# to deploy to infastructure
+./deploy.sh
 ```
 
 This builds the app in release mode similar to `cargo build --release`.
